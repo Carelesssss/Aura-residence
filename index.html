@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AURA RESIDENCE — жилой комплекс бизнес+ класса</title>
+<meta name="description" content="AURA RESIDENCE — жилой комплекс бизнес+ класса. Сдача в 2027 году, подземный паркинг, приватный парк.">
+
+<!-- Шрифты: Playfair Display (заголовки) и Inter (текст) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600;700&display=swap&subset=cyrillic" rel="stylesheet">
+
+<!-- Tailwind CSS через CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  // Настройки темы Tailwind: палитра и шрифты проекта
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          ink:   '#0D1117',   // основной фон
+          panel: '#161B22',   // вторичный фон
+          gold:  '#D4AF37',   // акцент
+          bronze:'#C5A059',   // акцент (тёплый)
+          paper: '#F0F6FC'    // светлый текст
+        },
+        fontFamily: {
+          serif: ['"Playfair Display"', 'Georgia', 'serif'],
+          sans:  ['Inter', 'system-ui', 'sans-serif']
+        }
+      }
+    }
+  }
+</script>
+
+<style>
+  html { scroll-behavior: smooth; scroll-padding-top: 88px; }
+  body { background:#0D1117; color:#F0F6FC; font-family:'Inter',system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+
+  /* Стеклянные карточки (glassmorphism) */
+  .glass {
+    background: rgba(22,27,34,.55);
+    border: 1px solid rgba(197,160,89,.18);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+  }
+
+  /* Тонкий золотой разделитель между секциями */
+  .divider { height:1px; background:linear-gradient(90deg, transparent, rgba(197,160,89,.45), transparent); }
+
+  /* Видимый фокус для клавиатуры */
+  :focus-visible { outline:2px solid #D4AF37; outline-offset:3px; border-radius:4px; }
+
+  /* Золотая кнопка */
+  .btn-gold { background:#D4AF37; color:#0D1117; font-weight:600; transition:background-color .3s, transform .3s; }
+  .btn-gold:hover { background:#e2c25a; transform:translateY(-1px); }
+  .btn-line { border:1px solid rgba(240,246,252,.35); transition:border-color .3s, color .3s, background-color .3s; }
+  .btn-line:hover { border-color:#D4AF37; color:#D4AF37; background:rgba(212,175,55,.06); }
+
+  /* Табы фильтра */
+  .tab { border:1px solid rgba(240,246,252,.18); color:rgba(240,246,252,.75); transition:all .3s; }
+  .tab:hover { border-color:#C5A059; color:#F0F6FC; }
+  .tab[aria-selected="true"] { background:#D4AF37; border-color:#D4AF37; color:#0D1117; font-weight:600; }
+
+  /* Карточки квартир: плавное появление при фильтрации */
+  .flat { transition:opacity .35s ease, transform .35s ease, border-color .3s; }
+  .flat.is-hidden { opacity:0; transform:translateY(12px) scale(.98); pointer-events:none; }
+  .flat:hover { border-color:rgba(212,175,55,.55); }
+
+  /* Анимация первого экрана — одна, на загрузке */
+  @keyframes rise { from { opacity:0; transform:translateY(24px);} to { opacity:1; transform:none;} }
+  .hero-in > * { opacity:0; animation:rise .9s cubic-bezier(.2,.7,.2,1) forwards; }
+  .hero-in > *:nth-child(1){ animation-delay:.1s } .hero-in > *:nth-child(2){ animation-delay:.25s }
+  .hero-in > *:nth-child(3){ animation-delay:.4s } .hero-in > *:nth-child(4){ animation-delay:.55s }
+
+  /* Ползунки калькулятора */
+  input[type=range] { -webkit-appearance:none; appearance:none; width:100%; height:4px; border-radius:999px;
+    background:linear-gradient(to right,#D4AF37 var(--p,0%), rgba(240,246,252,.18) var(--p,0%)); cursor:pointer; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:22px; height:22px; border-radius:50%;
+    background:#0D1117; border:3px solid #D4AF37; transition:transform .2s; }
+  input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.15); }
+  input[type=range]::-moz-range-thumb { width:16px; height:16px; border-radius:50%; background:#0D1117; border:3px solid #D4AF37; }
+
+  /* Поля формы */
+  .field { background:rgba(13,17,23,.6); border:1px solid rgba(240,246,252,.16); color:#F0F6FC; transition:border-color .3s; }
+  .field:focus { border-color:#D4AF37; outline:none; }
+  .field option { background:#161B22; }
+
+
+  /* ===== Сцена «ЖК со стороны» ===== */
+  #scene { --sky1:#5f86b4; --sky2:#f0d3ab; --f1:#7f97b6; --f2:#34475f; --glass:#92b4d8; --slab:#cdd6e2; --far:#93a8bf;
+           --tree:#2e4a3a; --lawn:#4a644e; --water:#7298b3; --cloud:#ffffff; --sunc:#fff1cc; }
+  #scene .c-g    { fill:var(--glass); opacity:.88; }
+  #scene .c-slab { fill:var(--slab); }
+  #scene .c-far  { fill:var(--far); }
+  #scene .c-tree { fill:var(--tree); }
+  #scene .c-lawn { fill:var(--lawn); }
+  #scene .c-water{ fill:var(--water); }
+  #scene .tower { cursor:pointer; }
+  #scene .tower .body { stroke:transparent; stroke-width:2.5; transition:stroke .3s; }
+  #scene .tower:hover .body { stroke:#D4AF37; }
+  #scene .star  { animation:tw 3.2s ease-in-out infinite alternate; }
+  @keyframes tw { from { opacity:.2; } to { opacity:1; } }
+  #scene .cloud { animation:drift 80s linear infinite alternate; }
+  @keyframes drift { from { transform:translateX(-120px); } to { transform:translateX(260px); } }
+  #scene .sweep { transform:translateX(-600px) skewX(-18deg); }
+  #scene .sweep.go { animation:sweep 3s cubic-bezier(.4,0,.2,1) .3s 1 forwards; }
+  @keyframes sweep { from { transform:translateX(-600px) skewX(-18deg); } to { transform:translateX(1800px) skewX(-18deg); } }
+  #scene .shoot { animation:shoot 12s linear infinite; opacity:0; }
+  @keyframes shoot { 0%,85% { transform:translate(0,0); opacity:0; } 87% { opacity:1; } 100% { transform:translate(-340px,190px); opacity:0; } }
+  #scene .shimmer { animation:shim 4s ease-in-out infinite alternate; }
+  @keyframes shim { from { opacity:.02; } to { opacity:.16; } }
+  .rail-b { color:rgba(240,246,252,.6); transition:color .3s; }
+  .rail-b:hover, .rail-b[aria-current="true"] { color:#D4AF37; }
+  @keyframes nudge { 0%,100% { transform:translateY(0); } 50% { transform:translateY(6px); } }
+
+  dialog::backdrop { background:rgba(0,0,0,.75); backdrop-filter:blur(4px); }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior:auto; }
+    * { animation:none !important; transition:none !important; }
+    .hero-in > * { opacity:1; }
+  }
+</style>
+</head>
+
+<body>
+
+<!-- ================= HEADER ================= -->
+<header id="header" class="fixed inset-x-0 top-0 z-50 transition-all duration-300">
+  <div class="max-w-7xl mx-auto px-5 lg:px-8 h-20 flex items-center justify-between">
+    <a href="#top" class="font-serif text-xl tracking-[.18em] text-paper">AURA <span class="text-gold">RESIDENCE</span></a>
+
+    <nav class="hidden lg:flex items-center gap-10 text-sm text-paper/80" aria-label="Основная навигация">
+      <a href="#about" class="hover:text-gold transition-colors">О проекте</a>
+      <a href="#flats" class="hover:text-gold transition-colors">Выбор квартиры</a>
+      <a href="#infra" class="hover:text-gold transition-colors">Инфраструктура</a>
+      <a href="#calc" class="hover:text-gold transition-colors">Калькулятор</a>
+    </nav>
+
+    <div class="flex items-center gap-3">
+      <a href="#contact" class="btn-gold hidden sm:inline-block px-5 py-2.5 rounded-full text-sm">Заказать звонок</a>
+      <button id="burger" class="lg:hidden p-2 text-paper" aria-label="Открыть меню" aria-expanded="false" aria-controls="mobile-menu">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Мобильное меню -->
+  <div id="mobile-menu" class="hidden lg:hidden glass border-x-0 border-b">
+    <nav class="px-5 py-5 flex flex-col gap-4 text-paper/90" aria-label="Мобильная навигация">
+      <a href="#about" class="mm-link">О проекте</a>
+      <a href="#flats" class="mm-link">Выбор квартиры</a>
+      <a href="#infra" class="mm-link">Инфраструктура</a>
+      <a href="#calc" class="mm-link">Калькулятор</a>
+      <a href="#contact" class="mm-link btn-gold text-center px-5 py-3 rounded-full">Заказать звонок</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ================= HERO ================= -->
+<section class="relative min-h-screen flex items-end overflow-hidden bg-ink" style="background:linear-gradient(180deg,#1b2540 0%,#4a3a5a 55%,#c9774f 100%)">
+  <!-- Фоновое изображение (Unsplash) -->
+  <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=2000&q=80"
+       alt="Фасад современного жилого комплекса" class="absolute inset-0 w-full h-full object-cover" onerror="this.remove()">
+  <div class="absolute inset-0" style="background:linear-gradient(180deg,rgba(13,17,23,.55) 0%,rgba(13,17,23,.45) 35%,rgba(13,17,23,.95) 100%)"></div>
+
+  <div class="relative max-w-7xl mx-auto px-5 lg:px-8 w-full pt-40 pb-16 lg:pb-24">
+    <div class="hero-in max-w-3xl">
+      <p class="text-bronze text-sm sm:text-base">Жилой комплекс бизнес+ класса</p>
+      <h1 class="font-serif text-5xl sm:text-6xl lg:text-7xl leading-[1.05] mt-4">Пространство вашей новой жизни</h1>
+      <p class="mt-6 text-lg text-paper/80 max-w-xl leading-relaxed">
+        Квартиры с панорамным остеклением, закрытый двор-парк и сервис, к которому привыкаешь с первого дня.
+      </p>
+      <div class="mt-9 flex flex-wrap gap-4">
+        <a href="#flats" class="btn-gold px-8 py-4 rounded-full">Выбрать квартиру</a>
+        <button id="video-open" class="btn-line px-8 py-4 rounded-full inline-flex items-center gap-3">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Смотреть видео
+        </button>
+      </div>
+    </div>
+
+    <!-- Краткие тезисы -->
+    <dl class="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-px bg-bronze/25 rounded-2xl overflow-hidden max-w-3xl">
+      <div class="glass !border-0 px-6 py-5"><dt class="text-sm text-paper/60">Срок сдачи</dt><dd class="font-serif text-2xl mt-1">2027 год</dd></div>
+      <div class="glass !border-0 px-6 py-5"><dt class="text-sm text-paper/60">Класс</dt><dd class="font-serif text-2xl mt-1">Бизнес+</dd></div>
+      <div class="glass !border-0 px-6 py-5"><dt class="text-sm text-paper/60">Паркинг</dt><dd class="font-serif text-2xl mt-1">Подземный</dd></div>
+    </dl>
+  </div>
+</section>
+
+
+<!-- ================= ЖК СО СТОРОНЫ: сцена, меняющаяся при прокрутке ================= -->
+<section id="view" class="relative" style="height:320vh" aria-labelledby="view-title">
+  <div class="sticky top-0 h-screen overflow-hidden bg-ink">
+    <svg id="scene" class="absolute inset-0 w-full h-full" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax meet"
+         role="img" aria-label="Иллюстрация жилого комплекса утром, на закате и ночью"></svg>
+    <div class="absolute inset-0 pointer-events-none" style="background:linear-gradient(180deg,rgba(13,17,23,.62) 0%,rgba(13,17,23,0) 30%,rgba(13,17,23,0) 72%,rgba(13,17,23,.88) 100%)"></div>
+
+    <div class="relative h-full max-w-7xl mx-auto px-5 lg:px-8 pt-28 pb-8 flex flex-col justify-between pointer-events-none">
+      <div class="max-w-xs sm:max-w-sm">
+        <h2 id="view-title" class="font-serif text-3xl sm:text-4xl lg:text-5xl leading-tight">Свет в вашем окне</h2>
+        <p id="view-text" class="mt-4 text-paper/90 text-sm sm:text-base min-h-[3rem]" aria-live="polite"></p>
+      </div>
+
+      <div class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between pointer-events-auto">
+        <p id="view-count" class="text-sm text-paper/80 sm:w-56 opacity-0 transition-opacity duration-500"></p>
+        <div class="w-full sm:w-80">
+          <div class="flex justify-between text-sm">
+            <button class="rail-b" data-p="0.02">Утро</button>
+            <button class="rail-b" data-p="0.5">Закат</button>
+            <button class="rail-b" data-p="0.98">Ночь</button>
+          </div>
+          <div class="mt-3 h-0.5 bg-paper/25 relative"><span id="rail-fill" class="absolute left-0 top-0 h-0.5 bg-gold" style="width:0"></span></div>
+        </div>
+        <a href="#flats" class="btn-line self-start sm:self-auto px-6 py-3 rounded-full text-sm sm:w-56 text-center" style="backdrop-filter:blur(8px)">Выбрать квартиру</a>
+      </div>
+    </div>
+
+    <div id="view-hint" class="absolute left-1/2 -translate-x-1/2 bottom-32 sm:bottom-28 text-sm text-paper/85 text-center pointer-events-none transition-opacity duration-500">
+      Листайте вниз — наступает вечер
+      <svg class="mx-auto mt-2 text-gold" style="animation:nudge 1.8s ease-in-out infinite" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ================= О ПРОЕКТЕ ================= -->
+<section id="about" class="py-24 lg:py-32">
+  <div class="max-w-7xl mx-auto px-5 lg:px-8 grid lg:grid-cols-2 gap-14 lg:gap-24 items-center">
+    <div>
+      <h2 class="font-serif text-4xl lg:text-5xl leading-tight">Дом, в котором тихо даже в центре города</h2>
+      <p class="mt-6 text-paper/75 leading-relaxed max-w-lg">
+        Четырнадцать этажей, 168 квартир и двор без машин. Потолки от 3,2 метра, окна в пол, отдельные входные группы для каждой секции.
+        Шумоизоляция межэтажных перекрытий — 62 дБ.
+      </p>
+      <dl class="mt-10 grid grid-cols-3 gap-6 max-w-lg">
+        <div><dd class="font-serif text-3xl text-gold">14</dd><dt class="text-sm text-paper/60 mt-1">этажей</dt></div>
+        <div><dd class="font-serif text-3xl text-gold">168</dd><dt class="text-sm text-paper/60 mt-1">квартир</dt></div>
+        <div><dd class="font-serif text-3xl text-gold">3,2 м</dd><dt class="text-sm text-paper/60 mt-1">потолки</dt></div>
+      </dl>
+    </div>
+    <div class="relative">
+      <svg viewBox="0 0 800 1000" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Интерьер квартиры с панорамным окном и видом на вечерний город"
+           class="rounded-2xl w-full aspect-[4/5] block" style="background:#161B22">
+        <defs>
+          <linearGradient id="in-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d1430"/><stop offset=".55" stop-color="#3a3560"/><stop offset="1" stop-color="#e08a5a"/></linearGradient>
+          <linearGradient id="in-floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b2b1d"/><stop offset="1" stop-color="#150f0a"/></linearGradient>
+          <linearGradient id="in-wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b212b"/><stop offset="1" stop-color="#12171e"/></linearGradient>
+          <linearGradient id="in-curL" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2a3240"/><stop offset="1" stop-color="#2a3240" stop-opacity="0"/></linearGradient>
+          <linearGradient id="in-curR" x1="1" y1="0" x2="0" y2="0"><stop offset="0" stop-color="#2a3240"/><stop offset="1" stop-color="#2a3240" stop-opacity="0"/></linearGradient>
+          <radialGradient id="in-glow"><stop offset="0" stop-color="#ffd98a" stop-opacity=".75"/><stop offset="1" stop-color="#ffd98a" stop-opacity="0"/></radialGradient>
+          <radialGradient id="in-moon"><stop offset="0" stop-color="#fff" stop-opacity=".4"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+          <pattern id="in-w1" width="42" height="18" patternUnits="userSpaceOnUse"><rect x="4" y="5" width="6" height="8" fill="#ffd98a"/><rect x="32" y="5" width="6" height="8" fill="#ffe3a8"/></pattern>
+          <pattern id="in-w2" width="36" height="16" patternUnits="userSpaceOnUse"><rect x="14" y="4" width="6" height="8" fill="#f6c26b"/><rect x="26" y="4" width="6" height="8" fill="#ffd98a"/></pattern>
+          <pattern id="in-w3" width="48" height="20" patternUnits="userSpaceOnUse"><rect x="6" y="6" width="6" height="8" fill="#ffeccc"/><rect x="20" y="6" width="6" height="8" fill="#ffd98a"/></pattern>
+          <clipPath id="in-glass"><rect x="70" y="90" width="660" height="520"/></clipPath>
+        </defs>
+
+        <!-- стена и пол -->
+        <rect width="800" height="1000" fill="url(#in-wall)"/>
+        <rect y="640" width="800" height="360" fill="url(#in-floor)"/>
+        <rect y="636" width="800" height="6" fill="#0c0f14"/>
+
+        <!-- вид из окна -->
+        <g clip-path="url(#in-glass)">
+          <rect x="70" y="90" width="660" height="520" fill="url(#in-sky)"/>
+          <g fill="#fff">
+            <circle cx="120" cy="130" r="1.4"/><circle cx="210" cy="180" r="1.1"/><circle cx="330" cy="120" r="1.5"/><circle cx="420" cy="165" r="1"/>
+            <circle cx="500" cy="115" r="1.3"/><circle cx="560" cy="210" r="1"/><circle cx="680" cy="150" r="1.4"/><circle cx="270" cy="240" r="1"/>
+          </g>
+          <circle cx="610" cy="190" r="70" fill="url(#in-moon)"/><circle cx="610" cy="190" r="22" fill="#f1efe4"/>
+          <g fill="#0b101b">
+            <rect x="70" y="470" width="60" height="140"/><rect x="125" y="380" width="45" height="230"/><rect x="165" y="430" width="70" height="180"/>
+            <rect x="230" y="310" width="50" height="300"/><rect x="275" y="400" width="80" height="210"/><rect x="350" y="350" width="45" height="260"/>
+            <rect x="390" y="440" width="70" height="170"/><rect x="455" y="270" width="55" height="340"/><rect x="505" y="390" width="75" height="220"/>
+            <rect x="575" y="330" width="50" height="280"/><rect x="620" y="420" width="70" height="190"/><rect x="685" y="360" width="55" height="250"/>
+          </g>
+          <g opacity=".7">
+            <rect x="70" y="470" width="60" height="140" fill="url(#in-w1)"/><rect x="125" y="380" width="45" height="230" fill="url(#in-w2)"/>
+            <rect x="165" y="430" width="70" height="180" fill="url(#in-w3)"/><rect x="230" y="310" width="50" height="300" fill="url(#in-w1)"/>
+            <rect x="275" y="400" width="80" height="210" fill="url(#in-w2)"/><rect x="350" y="350" width="45" height="260" fill="url(#in-w3)"/>
+            <rect x="390" y="440" width="70" height="170" fill="url(#in-w1)"/><rect x="455" y="270" width="55" height="340" fill="url(#in-w2)"/>
+            <rect x="505" y="390" width="75" height="220" fill="url(#in-w3)"/><rect x="575" y="330" width="50" height="280" fill="url(#in-w1)"/>
+            <rect x="620" y="420" width="70" height="190" fill="url(#in-w2)"/><rect x="685" y="360" width="55" height="250" fill="url(#in-w3)"/>
+          </g>
+          <polygon points="70,90 250,90 70,610" fill="#fff" opacity=".05"/>
+          <polygon points="330,90 420,90 180,610 90,610" fill="#fff" opacity=".04"/>
+        </g>
+        <!-- рама окна -->
+        <g fill="none" stroke="#C5A059" stroke-width="5">
+          <rect x="70" y="90" width="660" height="520"/>
+          <line x1="290" y1="90" x2="290" y2="610"/><line x1="510" y1="90" x2="510" y2="610"/>
+        </g>
+        <rect x="56" y="606" width="688" height="14" fill="#0c0f14"/>
+
+        <!-- шторы -->
+        <rect x="0" y="60" width="130" height="580" fill="url(#in-curL)"/>
+        <rect x="670" y="60" width="130" height="580" fill="url(#in-curR)"/>
+        <g stroke="#0c0f14" stroke-opacity=".35" stroke-width="2">
+          <line x1="28" y1="60" x2="28" y2="640"/><line x1="58" y1="60" x2="58" y2="640"/><line x1="88" y1="60" x2="88" y2="640"/>
+          <line x1="772" y1="60" x2="772" y2="640"/><line x1="742" y1="60" x2="742" y2="640"/><line x1="712" y1="60" x2="712" y2="640"/>
+        </g>
+        <rect x="0" y="52" width="800" height="8" fill="#0c0f14"/>
+
+        <!-- свет окна на полу -->
+        <polygon points="180,650 640,650 780,1000 20,1000" fill="#e08a5a" opacity=".07"/>
+
+        <!-- ковёр и столик -->
+        <ellipse cx="400" cy="880" rx="330" ry="82" fill="#1b222d"/>
+        <ellipse cx="400" cy="880" rx="300" ry="68" fill="none" stroke="#C5A059" stroke-opacity=".35"/>
+        <ellipse cx="400" cy="880" rx="270" ry="56" fill="none" stroke="#C5A059" stroke-opacity=".18"/>
+        <line x1="320" y1="850" x2="312" y2="905" stroke="#0c0f14" stroke-width="5"/><line x1="480" y1="850" x2="488" y2="905" stroke="#0c0f14" stroke-width="5"/>
+        <ellipse cx="400" cy="846" rx="118" ry="26" fill="#0f141c" stroke="#C5A059" stroke-width="2"/>
+        <rect x="372" y="818" width="22" height="26" rx="5" fill="#C5A059"/>
+        <rect x="414" y="832" width="56" height="8" fill="#e8e4d8"/><rect x="418" y="824" width="48" height="8" fill="#2f4a3a"/>
+
+        <!-- диван -->
+        <rect x="150" y="612" width="440" height="100" rx="26" fill="#2c3441"/>
+        <rect x="132" y="650" width="60" height="140" rx="22" fill="#323b4a"/>
+        <rect x="548" y="650" width="60" height="140" rx="22" fill="#323b4a"/>
+        <rect x="178" y="690" width="190" height="80" rx="16" fill="#3a4455"/>
+        <rect x="372" y="690" width="190" height="80" rx="16" fill="#3a4455"/>
+        <rect x="170" y="780" width="12" height="22" fill="#0c0f14"/><rect x="558" y="780" width="12" height="22" fill="#0c0f14"/>
+        <g transform="rotate(-8 220 665)"><rect x="190" y="634" width="62" height="62" rx="12" fill="#C5A059"/></g>
+        <g transform="rotate(7 520 665)"><rect x="490" y="636" width="60" height="60" rx="12" fill="#e8e4d8"/></g>
+
+        <!-- торшер -->
+        <line x1="668" y1="440" x2="668" y2="790" stroke="#C5A059" stroke-width="3"/>
+        <ellipse cx="668" cy="792" rx="30" ry="8" fill="#0c0f14"/>
+        <circle cx="668" cy="440" r="170" fill="url(#in-glow)"/>
+        <polygon points="636,392 700,392 714,446 622,446" fill="#ffe3a8"/>
+        <polygon points="622,446 714,446 790,760 546,760" fill="#ffd98a" opacity=".06"/>
+
+        <!-- растение -->
+        <path d="M112 760 C70 700 80 650 108 610 C112 660 128 700 112 760Z" fill="#2f4a3a"/>
+        <path d="M112 760 C150 710 160 660 140 620 C128 670 112 710 112 760Z" fill="#3a5a47"/>
+        <path d="M112 760 C95 720 60 700 40 700 C70 715 95 735 112 760Z" fill="#2f4a3a"/>
+        <path d="M82 760h60l-8 62H90z" fill="#2a2018"/>
+      </svg>
+      <div class="glass rounded-xl px-5 py-4 absolute -bottom-6 left-6 right-6 sm:right-auto sm:max-w-xs">
+        <p class="text-sm text-paper/80">Эксклюзивная архитектура, закрытая территория и круглосуточная охрана.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ================= ВЫБОР КВАРТИРЫ ================= -->
+<section id="flats" class="py-24 lg:py-32 bg-panel/40">
+  <div class="max-w-7xl mx-auto px-5 lg:px-8">
+    <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
+      <div>
+        <h2 class="font-serif text-4xl lg:text-5xl">Выбор квартиры</h2>
+        <p class="mt-4 text-paper/70 max-w-md">Отфильтруйте планировки по количеству комнат. Цены ориентировочные, точную стоимость назовёт менеджер.</p>
+      </div>
+
+      <!-- Табы-фильтры -->
+      <div role="tablist" aria-label="Фильтр по комнатности" id="filters" class="flex flex-wrap gap-2">
+        <button role="tab" aria-selected="true"  data-filter="all"   class="tab px-5 py-2.5 rounded-full text-sm">Все</button>
+        <button role="tab" aria-selected="false" data-filter="1"     class="tab px-5 py-2.5 rounded-full text-sm">1-комнатные</button>
+        <button role="tab" aria-selected="false" data-filter="2"     class="tab px-5 py-2.5 rounded-full text-sm">2-комнатные</button>
+        <button role="tab" aria-selected="false" data-filter="3"     class="tab px-5 py-2.5 rounded-full text-sm">3-комнатные</button>
+        <button role="tab" aria-selected="false" data-filter="pent"  class="tab px-5 py-2.5 rounded-full text-sm">Пентхаусы</button>
+      </div>
+    </div>
+
+    <!-- Сетка карточек (заполняется скриптом ниже) -->
+    <div id="flat-grid" class="mt-12 grid sm:grid-cols-2 xl:grid-cols-3 gap-6" aria-live="polite"></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ================= ИНФРАСТРУКТУРА ================= -->
+<section id="infra" class="py-24 lg:py-32">
+  <div class="max-w-7xl mx-auto px-5 lg:px-8">
+    <h2 class="font-serif text-4xl lg:text-5xl max-w-xl">Всё, что нужно, — не выходя со двора</h2>
+
+    <div class="mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+      <article class="glass rounded-2xl p-7 transition-colors duration-300 hover:border-gold/60">
+        <svg class="text-gold" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M10 10v.2A3 3 0 0 1 8.9 16H5a3 3 0 0 1-1-5.8V10a3 3 0 0 1 6 0Z"/><path d="M7 16v6"/><path d="M13 19v3"/>
+          <path d="M12 19h8.3a1 1 0 0 0 .7-1.7L18 14h.3a1 1 0 0 0 .7-1.7L16 9h.2a1 1 0 0 0 .8-1.7L13 3l-1.4 1.5"/>
+        </svg>
+        <h3 class="font-serif text-2xl mt-6">Приватный парк</h3>
+        <p class="mt-3 text-sm text-paper/70 leading-relaxed">Два гектара ландшафта только для жителей: пруд, аллеи и зоны тишины без машин.</p>
+      </article>
+
+      <article class="glass rounded-2xl p-7 transition-colors duration-300 hover:border-gold/60">
+        <svg class="text-gold" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 20a1 1 0 0 1-1-1v-1a1 1 0 0 1 1-1h18a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1Z"/><path d="M20 16a8 8 0 1 0-16 0"/><path d="M12 4v4"/><path d="M10 4h4"/>
+        </svg>
+        <h3 class="font-serif text-2xl mt-6">Консьерж-сервис 24/7</h3>
+        <p class="mt-3 text-sm text-paper/70 leading-relaxed">Встретят гостей, примут посылки, вызовут такси и закажут клининг в вашу квартиру.</p>
+      </article>
+
+      <article class="glass rounded-2xl p-7 transition-colors duration-300 hover:border-gold/60">
+        <svg class="text-gold" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/>
+        </svg>
+        <h3 class="font-serif text-2xl mt-6">Фитнес и SPA</h3>
+        <p class="mt-3 text-sm text-paper/70 leading-relaxed">Тренажёрный зал, бассейн 25 метров, хамам и сауна — на первом этаже вашего дома.</p>
+      </article>
+
+      <article class="glass rounded-2xl p-7 transition-colors duration-300 hover:border-gold/60">
+        <svg class="text-gold" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01"/><path d="M15 9h.01"/>
+        </svg>
+        <h3 class="font-serif text-2xl mt-6">Детский клуб</h3>
+        <p class="mt-3 text-sm text-paper/70 leading-relaxed">Игровые комнаты, творческие студии и воспитатели, пока вы заняты своими делами.</p>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ================= КАЛЬКУЛЯТОР ИПОТЕКИ ================= -->
+<section id="calc" class="py-24 lg:py-32 bg-panel/40">
+  <div class="max-w-7xl mx-auto px-5 lg:px-8">
+    <h2 class="font-serif text-4xl lg:text-5xl">Калькулятор ипотеки</h2>
+    <p class="mt-4 text-paper/70 max-w-md">Подвигайте ползунки — платёж пересчитывается сразу.</p>
+
+    <div class="mt-12 grid lg:grid-cols-5 gap-8">
+      <!-- Ползунки -->
+      <div class="glass rounded-2xl p-7 lg:p-10 lg:col-span-3 space-y-9">
+        <div>
+          <div class="flex justify-between items-baseline">
+            <label for="price" class="text-paper/80">Стоимость квартиры</label>
+            <output id="price-out" class="font-serif text-2xl text-gold"></output>
+          </div>
+          <input id="price" type="range" min="6000000" max="60000000" step="100000" value="18000000" class="mt-4">
+        </div>
+        <div>
+          <div class="flex justify-between items-baseline">
+            <label for="down" class="text-paper/80">Первоначальный взнос</label>
+            <output id="down-out" class="font-serif text-2xl text-gold"></output>
+          </div>
+          <input id="down" type="range" min="0" max="1" step="100000" value="0" class="mt-4">
+          <p id="down-hint" class="mt-2 text-sm text-paper/55"></p>
+        </div>
+        <div class="grid sm:grid-cols-2 gap-9">
+          <div>
+            <div class="flex justify-between items-baseline">
+              <label for="term" class="text-paper/80">Срок</label>
+              <output id="term-out" class="font-serif text-xl text-gold"></output>
+            </div>
+            <input id="term" type="range" min="5" max="30" step="1" value="20" class="mt-4">
+          </div>
+          <div>
+            <div class="flex justify-between items-baseline">
+              <label for="rate" class="text-paper/80">Ставка</label>
+              <output id="rate-out" class="font-serif text-xl text-gold"></output>
+            </div>
+            <input id="rate" type="range" min="2" max="25" step="0.1" value="12" class="mt-4">
+          </div>
+        </div>
+      </div>
+
+      <!-- Результат -->
+      <div class="glass rounded-2xl p-7 lg:p-10 lg:col-span-2 flex flex-col justify-between" style="border-color:rgba(212,175,55,.4)">
+        <div>
+          <p class="text-paper/70">Ежемесячный платёж</p>
+          <p id="monthly" class="font-serif text-5xl lg:text-6xl text-gold mt-3 leading-none" aria-live="polite"></p>
+        </div>
+        <dl class="mt-10 space-y-4 text-sm">
+          <div class="flex justify-between border-t border-paper/10 pt-4"><dt class="text-paper/65">Сумма кредита</dt><dd id="loan" class="font-medium"></dd></div>
+          <div class="flex justify-between border-t border-paper/10 pt-4"><dt class="text-paper/65">Переплата за весь срок</dt><dd id="overpay" class="font-medium"></dd></div>
+        </dl>
+        <a href="#contact" class="btn-gold mt-8 text-center px-6 py-4 rounded-full">Получить точный расчёт</a>
+        <p class="mt-4 text-xs text-paper/45">Расчёт аннуитетных платежей, носит информационный характер и не является офертой.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ================= ФОРМА ЗАЯВКИ ================= -->
+<section id="contact" class="py-24 lg:py-32 relative overflow-hidden">
+  <div class="max-w-7xl mx-auto px-5 lg:px-8 grid lg:grid-cols-2 gap-14 lg:gap-24">
+    <div>
+      <h2 class="font-serif text-4xl lg:text-5xl leading-tight">Покажем квартиры и ответим на вопросы</h2>
+      <p class="mt-6 text-paper/75 max-w-md leading-relaxed">Оставьте номер — менеджер перезвонит в выбранное время и подберёт планировку под ваш бюджет.</p>
+    </div>
+
+    <form id="lead-form" class="glass rounded-2xl p-7 lg:p-10 space-y-5" novalidate>
+      <!-- Сюда попадает выбранная квартира после нажатия «Забронировать» -->
+      <div id="chosen" class="hidden items-center justify-between gap-4 rounded-xl px-4 py-3 text-sm" style="background:rgba(212,175,55,.1);border:1px solid rgba(212,175,55,.35)">
+        <span id="chosen-text"></span>
+        <button type="button" id="chosen-clear" class="text-paper/60 hover:text-gold transition-colors" aria-label="Убрать выбранную квартиру">Убрать</button>
+      </div>
+
+      <div>
+        <label for="name" class="block text-sm text-paper/70 mb-2">Имя</label>
+        <input id="name" name="name" type="text" autocomplete="name" required class="field w-full rounded-xl px-4 py-3.5" placeholder="Как к вам обращаться">
+        <p class="err hidden mt-1.5 text-sm text-red-300" data-for="name">Введите имя</p>
+      </div>
+      <div>
+        <label for="phone" class="block text-sm text-paper/70 mb-2">Телефон</label>
+        <input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required class="field w-full rounded-xl px-4 py-3.5" placeholder="+7 (___) ___-__-__">
+        <p class="err hidden mt-1.5 text-sm text-red-300" data-for="phone">Укажите номер полностью, например +7 900 123-45-67</p>
+      </div>
+      <div>
+        <label for="time" class="block text-sm text-paper/70 mb-2">Удобное время звонка</label>
+        <select id="time" name="time" class="field w-full rounded-xl px-4 py-3.5">
+          <option>Сегодня, в течение часа</option>
+          <option>Утром, 9:00–12:00</option>
+          <option>Днём, 12:00–17:00</option>
+          <option>Вечером, 17:00–21:00</option>
+        </select>
+      </div>
+      <button type="submit" class="btn-gold w-full px-6 py-4 rounded-full">Заказать звонок</button>
+      <p class="text-xs text-paper/45">Нажимая кнопку, вы соглашаетесь на обработку персональных данных.</p>
+      <p id="form-ok" class="hidden rounded-xl px-4 py-3 text-sm" style="background:rgba(212,175,55,.12);border:1px solid rgba(212,175,55,.4)" role="status">
+        Заявка отправлена. Мы перезвоним в выбранное время.
+      </p>
+    </form>
+  </div>
+</section>
+
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer class="border-t border-bronze/20 bg-panel/60">
+  <div class="max-w-7xl mx-auto px-5 lg:px-8 py-14 grid md:grid-cols-3 gap-10">
+    <div>
+      <p class="font-serif text-xl tracking-[.18em]">AURA <span class="text-gold">RESIDENCE</span></p>
+      <p class="mt-4 text-sm text-paper/60 max-w-xs">Жилой комплекс бизнес+ класса. Сдача — 2027 год.</p>
+    </div>
+    <div class="text-sm space-y-2">
+      <p class="text-paper/55">Отдел продаж</p>
+      <a href="tel:+70000000000" class="block text-lg hover:text-gold transition-colors">+7 (000) 000-00-00</a>
+      <a href="mailto:sales@aura-residence.example" class="block hover:text-gold transition-colors">sales@aura-residence.example</a>
+    </div>
+    <div class="text-sm space-y-2">
+      <p class="text-paper/55">Офис продаж</p>
+      <p>г. Москва, ул. Примерная, 1</p>
+      <p class="text-paper/60">Ежедневно, 9:00–21:00</p>
+    </div>
+  </div>
+  <div class="border-t border-paper/10">
+    <div class="max-w-7xl mx-auto px-5 lg:px-8 py-6 text-xs text-paper/45 flex flex-col sm:flex-row justify-between gap-2">
+      <p>© 2026 AURA RESIDENCE. Все права защищены.</p>
+      <p>Информация на сайте не является публичной офертой.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ================= МОДАЛЬНОЕ ОКНО С ВИДЕО ================= -->
+<dialog id="video-modal" class="bg-transparent p-0 w-[min(92vw,960px)] max-w-none backdrop:bg-black/70">
+  <div class="glass rounded-2xl overflow-hidden">
+    <div class="flex justify-between items-center px-5 py-3 border-b border-paper/10">
+      <p class="text-sm text-paper/80">Видео о комплексе</p>
+      <button id="video-close" class="text-paper/70 hover:text-gold transition-colors" aria-label="Закрыть видео">Закрыть</button>
+    </div>
+    <div id="video-box" class="aspect-video bg-ink grid place-items-center text-center text-paper/60 text-sm px-6"></div>
+  </div>
+</dialog>
+
+
+<script>
+/* =====================================================================
+   НАСТРОЙКИ: замените на свои значения
+   ===================================================================== */
+// Ссылка на видео для встраивания (например, https://www.youtube.com/embed/XXXXXXXXXXX). Пусто — покажется заглушка.
+const VIDEO_URL = '';
+
+// Данные квартир. type: '1' | '2' | '3' | 'pent'
+const FLATS = [
+  { id:1, type:'1',    title:'1-комнатная',   area:42.6,  floor:5,  price:12400000 },
+  { id:2, type:'1',    title:'1-комнатная',   area:48.2,  floor:9,  price:14100000 },
+  { id:3, type:'2',    title:'2-комнатная',   area:68.4,  floor:7,  price:19800000 },
+  { id:4, type:'2',    title:'2-комнатная',   area:74.9,  floor:11, price:22600000 },
+  { id:5, type:'3',    title:'3-комнатная',   area:104.3, floor:12, price:32900000 },
+  { id:6, type:'pent', title:'Пентхаус',      area:186.0, floor:14, price:68500000 }
+];
+
+/* Простые схемы планировок: [x, y, ширина, высота, подпись, пунктир?] в системе 200×140 */
+const PLANS = {
+  '1': [[10,10,115,80,'Гостиная'],[125,10,65,55,'Кухня'],[125,65,65,25,'Санузел'],[10,90,80,40,'Прихожая'],[90,90,100,40,'Лоджия',1]],
+  '2': [[10,10,80,60,'Спальня'],[90,10,100,60,'Гостиная'],[10,70,55,35,'Кухня'],[65,70,45,35,'Санузел'],[110,70,80,35,'Кабинет'],[10,105,180,25,'Лоджия',1]],
+  '3': [[10,10,70,50,'Спальня'],[80,10,60,50,'Детская'],[140,10,50,50,'Кабинет'],[10,60,110,45,'Гостиная'],[120,60,70,45,'Кухня'],[10,105,60,25,'С/у'],[70,105,120,25,'Терраса',1]],
+  'pent': [[10,10,85,50,'Мастер-спальня'],[95,10,95,50,'Гостиная'],[10,60,50,35,'Гардероб'],[60,60,50,35,'Спальня'],[110,60,80,35,'Кухня-столовая'],[10,95,180,35,'Терраса с панорамой',1]]
+};
+
+const fmtRub = n => Math.round(n).toLocaleString('ru-RU') + ' ₽';
+const fmtMln = n => (n/1e6).toLocaleString('ru-RU',{maximumFractionDigits:1}) + ' млн ₽';
+
+/* =====================================================================
+   HEADER: фон при прокрутке и мобильное меню
+   ===================================================================== */
+const header = document.getElementById('header');
+const burger = document.getElementById('burger');
+const mobile = document.getElementById('mobile-menu');
+
+function onScroll(){
+  const scrolled = window.scrollY > 40;
+  header.style.background = scrolled ? 'rgba(13,17,23,.82)' : 'transparent';
+  header.style.backdropFilter = scrolled ? 'blur(14px)' : 'none';
+  header.style.webkitBackdropFilter = header.style.backdropFilter;
+  header.style.borderBottom = scrolled ? '1px solid rgba(197,160,89,.18)' : '1px solid transparent';
+}
+window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
+
+burger.addEventListener('click', () => {
+  const open = mobile.classList.toggle('hidden') === false;
+  burger.setAttribute('aria-expanded', String(open));
+});
+document.querySelectorAll('.mm-link').forEach(a => a.addEventListener('click', () => {
+  mobile.classList.add('hidden'); burger.setAttribute('aria-expanded','false');
+}));
+
+/* =====================================================================
+   КАРТОЧКИ КВАРТИР + ФИЛЬТР
+   ===================================================================== */
+const grid = document.getElementById('flat-grid');
+
+// Рисуем SVG-планировку
+function planSvg(type){
+  const rooms = PLANS[type].map(([x,y,w,h,label,dashed]) => `
+    <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${dashed ? 'none' : 'rgba(212,175,55,.05)'}"
+          stroke="#C5A059" stroke-width="1.2" ${dashed ? 'stroke-dasharray="4 3"' : ''}/>
+    <text x="${x+w/2}" y="${y+h/2+3}" text-anchor="middle" font-size="8" fill="#F0F6FC" fill-opacity=".7" font-family="Inter,sans-serif">${label}</text>`).join('');
+  return `<svg viewBox="0 0 200 140" class="w-full h-full" role="img" aria-label="Схема планировки">${rooms}</svg>`;
+}
+
+function renderFlats(){
+  grid.innerHTML = FLATS.map(f => `
+    <article class="flat glass rounded-2xl p-5 flex flex-col" data-type="${f.type}">
+      <div class="rounded-xl bg-ink/60 p-3 aspect-[10/7]">${planSvg(f.type)}</div>
+      <div class="mt-5 flex items-start justify-between gap-4">
+        <h3 class="font-serif text-2xl">${f.title}</h3>
+        <p class="font-serif text-xl text-gold whitespace-nowrap">от ${fmtMln(f.price)}</p>
+      </div>
+      <dl class="mt-3 flex gap-8 text-sm text-paper/70">
+        <div><dt class="text-paper/45">Площадь</dt><dd>${f.area.toLocaleString('ru-RU')} м²</dd></div>
+        <div><dt class="text-paper/45">Этаж</dt><dd>${f.floor}</dd></div>
+        <div><dt class="text-paper/45">Цена за м²</dt><dd>${Math.round(f.price/f.area/1000)} тыс. ₽</dd></div>
+      </dl>
+      <button class="book btn-gold mt-6 w-full py-3.5 rounded-full text-sm" data-id="${f.id}">Забронировать</button>
+    </article>`).join('');
+}
+renderFlats();
+
+// Переключение табов
+const tabs = document.querySelectorAll('#filters .tab');
+tabs.forEach(tab => tab.addEventListener('click', () => {
+  tabs.forEach(t => t.setAttribute('aria-selected', String(t === tab)));
+  const f = tab.dataset.filter;
+  document.querySelectorAll('.flat').forEach(card => {
+    const show = f === 'all' || card.dataset.type === f;
+    if (show) { card.style.display = ''; requestAnimationFrame(() => card.classList.remove('is-hidden')); }
+    else {
+      card.classList.add('is-hidden');
+      setTimeout(() => { if (card.classList.contains('is-hidden')) card.style.display = 'none'; }, 350);
+    }
+  });
+}));
+
+/* Бронирование: подставляем выбранную квартиру в форму и прокручиваем к ней */
+const chosen = document.getElementById('chosen');
+const chosenText = document.getElementById('chosen-text');
+let chosenFlat = '';
+grid.addEventListener('click', e => {
+  const btn = e.target.closest('.book'); if (!btn) return;
+  const f = FLATS.find(x => x.id === +btn.dataset.id);
+  chosenFlat = `${f.title}, ${f.area} м², ${f.floor} этаж`;
+  chosenText.textContent = 'Вы выбрали: ' + chosenFlat;
+  chosen.classList.remove('hidden'); chosen.classList.add('flex');
+  document.getElementById('contact').scrollIntoView({behavior:'smooth'});
+  setTimeout(() => document.getElementById('name').focus({preventScroll:true}), 600);
+});
+document.getElementById('chosen-clear').addEventListener('click', () => {
+  chosenFlat = ''; chosen.classList.add('hidden'); chosen.classList.remove('flex');
+});
+
+/* =====================================================================
+   КАЛЬКУЛЯТОР ИПОТЕКИ (аннуитет)
+   ===================================================================== */
+const $ = id => document.getElementById(id);
+const priceEl = $('price'), downEl = $('down'), termEl = $('term'), rateEl = $('rate');
+
+function fillTrack(el){ el.style.setProperty('--p', ((el.value-el.min)/(el.max-el.min)*100) + '%'); }
+
+function calc(){
+  const price = +priceEl.value;
+
+  // Первоначальный взнос: от 10% до 90% стоимости. Диапазон ползунка зависит от цены.
+  const minDown = Math.ceil(price*0.1/100000)*100000;
+  const maxDown = Math.floor(price*0.9/100000)*100000;
+  downEl.min = minDown; downEl.max = maxDown;
+  if (+downEl.value < minDown) downEl.value = minDown;
+  if (+downEl.value > maxDown) downEl.value = maxDown;
+  const down = +downEl.value;
+
+  const years = +termEl.value, rate = +rateEl.value;
+  const loan = price - down;
+  const n = years*12, i = rate/100/12;
+  const monthly = i === 0 ? loan/n : loan * i / (1 - Math.pow(1+i, -n));
+  const total = monthly*n;
+
+  $('price-out').textContent = fmtRub(price);
+  $('down-out').textContent  = fmtRub(down);
+  $('down-hint').textContent = `${Math.round(down/price*100)}% от стоимости`;
+  $('term-out').textContent  = years + ' ' + (years%10===1 && years!==11 ? 'год' : (years%10>=2 && years%10<=4 && (years<10||years>20) ? 'года' : 'лет'));
+  $('rate-out').textContent  = rate.toLocaleString('ru-RU',{minimumFractionDigits:1}) + '%';
+  $('monthly').textContent   = fmtRub(monthly);
+  $('loan').textContent      = fmtRub(loan);
+  $('overpay').textContent   = fmtRub(total - loan);
+
+  [priceEl, downEl, termEl, rateEl].forEach(fillTrack);
+}
+[priceEl, downEl, termEl, rateEl].forEach(el => el.addEventListener('input', calc));
+// Начальный взнос по умолчанию — 30%
+downEl.min = 0; downEl.max = +priceEl.value; downEl.value = Math.round(+priceEl.value*0.3/100000)*100000;
+calc();
+
+/* =====================================================================
+   ФОРМА ЗАЯВКИ: маска телефона и проверка
+   ===================================================================== */
+const form = $('lead-form'), phone = $('phone');
+
+phone.addEventListener('input', () => {
+  let d = phone.value.replace(/\D/g,'');
+  if (d.startsWith('8')) d = '7' + d.slice(1);
+  if (!d.startsWith('7')) d = '7' + d;
+  d = d.slice(0,11);
+  const p = [ '+7', d.slice(1,4) && ' (' + d.slice(1,4), d.length>4 && ') ' + d.slice(4,7), d.length>7 && '-' + d.slice(7,9), d.length>9 && '-' + d.slice(9,11) ];
+  phone.value = p.filter(Boolean).join('');
+});
+
+function setErr(field, bad){
+  document.querySelector(`.err[data-for="${field}"]`).classList.toggle('hidden', !bad);
+  $(field).setAttribute('aria-invalid', String(bad));
+}
+
+form.addEventListener('submit', e => {
+  e.preventDefault();
+  const nameBad  = $('name').value.trim().length < 2;
+  const phoneBad = phone.value.replace(/\D/g,'').length < 11;
+  setErr('name', nameBad); setErr('phone', phoneBad);
+  if (nameBad || phoneBad) return;
+
+  // Здесь подключается отправка на сервер / CRM, например через fetch('/api/lead', {...})
+  console.log('Заявка:', { name:$('name').value, phone:phone.value, time:$('time').value, flat:chosenFlat });
+
+  $('form-ok').classList.remove('hidden');
+  form.reset();
+  chosenFlat = ''; chosen.classList.add('hidden'); chosen.classList.remove('flex');
+});
+
+/* =====================================================================
+   ВИДЕО В МОДАЛЬНОМ ОКНЕ
+   ===================================================================== */
+const modal = $('video-modal'), box = $('video-box');
+$('video-open').addEventListener('click', () => {
+  box.innerHTML = VIDEO_URL
+    ? `<iframe src="${VIDEO_URL}" class="w-full h-full" allow="autoplay; encrypted-media; fullscreen" allowfullscreen title="Видео о комплексе"></iframe>`
+    : 'Здесь появится видео о комплексе.<br>Вставьте ссылку в константу VIDEO_URL в конце файла.';
+  modal.showModal();
+});
+function closeVideo(){ modal.close(); box.innerHTML = ''; }
+$('video-close').addEventListener('click', closeVideo);
+modal.addEventListener('click', e => { if (e.target === modal) closeVideo(); });
+modal.addEventListener('cancel', () => { box.innerHTML = ''; });
+
+/* =====================================================================
+   СЦЕНА «ЖК СО СТОРОНЫ»
+   Рисуется кодом (SVG). Время суток управляется прокруткой: утро → закат → ночь.
+   ===================================================================== */
+(function(){
+  const sec = document.getElementById('view'), svg = document.getElementById('scene');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const G = 760;                                   // линия земли в координатах сцены
+  const clamp = (v,a,b) => Math.min(b, Math.max(a, v));
+  const sm = (a,b,x) => { const t = clamp((x-a)/(b-a),0,1); return t*t*(3-2*t); };
+
+  // Палитра: [утро, закат, ночь]
+  const PAL = {
+    sky1:['#5f86b4','#2e3560','#03060b'], sky2:['#f0d3ab','#e58f5e','#152033'],
+    f1:['#7f97b6','#4d4a66','#10161f'],    f2:['#34475f','#241e2c','#090d13'],
+    glass:['#92b4d8','#c98e6a','#0b1018'], slab:['#cdd6e2','#8d7d82','#2b3444'],
+    far:['#93a8bf','#4c4662','#0b1119'],   tree:['#2e4a3a','#1c2a2b','#09120e'],
+    lawn:['#4a644e','#2b3b34','#0b1310'],  water:['#7298b3','#4d4b66','#08121c'],
+    cloud:['#ffffff','#f6b78c','#1b2540'], sunc:['#fff1cc','#ff9d5c','#ff9d5c']
+  };
+  const hx = h => [1,3,5].map(i => parseInt(h.substr(i,2),16));
+  const mixc = (a,b,t) => { const A=hx(a), B=hx(b); return '#'+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,'0')).join(''); };
+  const pick = (arr,p) => p<.5 ? mixc(arr[0],arr[1],p/.5) : mixc(arr[1],arr[2],(p-.5)/.5);
+
+  // Детерминированный генератор случайных чисел — сцена всегда одинаковая
+  function rng(seed){ return function(){ seed|=0; seed=seed+0x6D2B79F5|0; let t=Math.imul(seed^seed>>>15,1|seed);
+    t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+  const R = rng(11);
+  const LIT = ['#ffd98a','#ffe3a8','#f6c26b','#ffeccc','#ffd98a','#ffcf7a','#d9e8ff'];
+  const clipRects = [];
+
+  // Окно: тёмное стекло + слой «свет включён» (его прозрачность меняет скрипт)
+  function win(x,y,w,h,thr,counted){
+    let s = `<rect class="c-g" x="${x}" y="${y}" width="${w}" height="${h}" rx="1.5"/>`;
+    if (thr < 2) s += `<rect class="l" data-t="${thr.toFixed(3)}" data-c="${counted?1:0}" x="${x}" y="${y}" width="${w}" height="${h}" rx="1.5" fill="${LIT[(R()*LIT.length)|0]}" style="opacity:0"/>`;
+    return s;
+  }
+
+  // Башня: корпус, перекрытия, окна, балконные ограждения
+  function tower(name,x,w,floors,fh,setback,haze){
+    const top = G - floors*fh, main = setback ? floors-2 : floors;
+    let s = `<g class="tower" data-name="${name}">`;
+    s += `<rect class="body" x="${x}" y="${G-main*fh}" width="${w}" height="${main*fh}" style="fill:url(#facade)"/>`;
+    clipRects.push([x,G-main*fh,w,main*fh]);
+    if (setback){
+      s += `<rect class="body" x="${x+34}" y="${top}" width="${w-68}" height="${2*fh}" style="fill:url(#facade)"/>`;
+      clipRects.push([x+34,top,w-68,2*fh]);
+    }
+    for (let k=0;k<floors;k++){
+      const inset = (setback && k>=floors-2) ? 34 : 0, x0 = x+inset, ww = w-inset*2, yt = G-(k+1)*fh;
+      s += `<rect class="c-slab" x="${x0-6}" y="${yt-1}" width="${ww+12}" height="5"/>`;
+      if (k >= 1){
+        const cols = Math.floor((ww-28)/36), step = (ww-28)/cols;
+        for (let c=0;c<cols;c++){
+          const wx = x0+14+c*step+6, on = R()<.74, thr = on ? .5+Math.pow(R(),1.3)*.44 : 9;
+          s += win(wx, yt+8, step-12, 24, thr, true);
+          if (R()<.4) s += `<rect class="c-slab" x="${wx-3}" y="${yt+fh-6}" width="${step-6}" height="2" opacity=".55"/>`;
+        }
+      }
+    }
+    s += `<rect class="c-slab" x="${x+w/2-30}" y="${top-14}" width="60" height="14"/>`;     // технический блок на крыше
+    if (haze) s += `<rect x="${x}" y="${top-14}" width="${w}" height="${G-top+14}" style="fill:var(--sky2)" opacity=".38" pointer-events="none"/>`;
+    return s + '</g>';
+  }
+
+  // Далёкий город
+  function city(){
+    let s = '', x = -700;
+    while (x < 2300){
+      const w = 36+R()*50, h = 50+R()*170;
+      s += `<rect class="c-far" x="${x.toFixed(0)}" y="${(G-h).toFixed(0)}" width="${w.toFixed(0)}" height="${h.toFixed(0)}"/>`;
+      for (let yy=G-h+8; yy<G-10; yy+=14) for (let xx=x+5; xx<x+w-8; xx+=11)
+        if (R()<.3) s += `<rect class="l" data-t="${(.55+R()*.4).toFixed(3)}" data-c="0" x="${xx.toFixed(0)}" y="${yy.toFixed(0)}" width="4" height="5" fill="#ffd98a" style="opacity:0"/>`;
+      x += w + R()*6;
+    }
+    return s;
+  }
+
+  // Стилобат с входной группой
+  function podium(){
+    let s = `<rect class="c-slab" x="320" y="718" width="870" height="42"/>`;
+    for (let px=336; px<1176; px+=40){
+      if (px>680 && px<830) continue;
+      s += `<rect class="c-g" x="${px}" y="726" width="32" height="28" rx="1.5"/>` +
+           `<rect class="l" data-t="${(.35+R()*.25).toFixed(3)}" data-c="0" x="${px}" y="726" width="32" height="28" rx="1.5" fill="#ffd98a" style="opacity:0"/>`;
+    }
+    return s + `<rect x="696" y="722" width="118" height="38" fill="#0a0e14" stroke="#C5A059" stroke-width="1.2"/>` +
+      `<text x="755" y="746" text-anchor="middle" font-family="Playfair Display,serif" font-size="12" letter-spacing="3" fill="#D4AF37">AURA</text>`;
+  }
+
+  function tree(x,sc){
+    return `<rect class="c-tree" x="${x-4}" y="${760-46*sc}" width="8" height="${46*sc}"/>` +
+      `<ellipse class="c-tree" cx="${x}" cy="${760-76*sc}" rx="${44*sc}" ry="${60*sc}"/>` +
+      `<ellipse class="c-tree" cx="${x-22*sc}" cy="${760-56*sc}" rx="${28*sc}" ry="${34*sc}"/>` +
+      `<ellipse class="c-tree" cx="${x+24*sc}" cy="${760-58*sc}" rx="${28*sc}" ry="${34*sc}"/>`;
+  }
+
+  // Сборка слоёв (по глубине — для параллакса)
+  const layCity = city();
+  const layBack = tower('Секция Г',1120,190,10,38,false,true) + tower('Секция Д',250,140,7,38,false,true);
+  const layMid  = tower('Секция В · 8 этажей · 1-комнатные',340,230,8,38,false,false) +
+                  tower('Секция Б · 11 этажей · 1–2-комнатные',890,260,11,38,false,false);
+  const layFront= tower('Секция А · 14 этажей · 2–3-комнатные и пентхаусы',560,340,14,38,true,false) +
+                  `<rect id="crown" x="594" y="222" width="272" height="3" fill="#D4AF37" opacity="0"/>` + podium();
+
+  let stars = '';
+  for (let i=0;i<150;i++){
+    const r = (.7+R()*1.3).toFixed(1);
+    stars += `<circle class="star" cx="${(-500+R()*2600).toFixed(0)}" cy="${(-1300+R()*1800).toFixed(0)}" r="${r}" fill="#fff" style="animation-delay:${(R()*3).toFixed(1)}s;animation-duration:${(2+R()*3).toFixed(1)}s"/>`;
+  }
+  let lamps = '';
+  [270,1330,130,1470].forEach(x => lamps += `<line x1="${x}" y1="722" x2="${x}" y2="760" stroke="#1a2230" stroke-width="3"/><circle cx="${x}" cy="718" r="38" fill="url(#lampG)"/><circle cx="${x}" cy="718" r="3.5" fill="#ffd98a"/>`);
+  let shim = '';
+  for (let i=0;i<7;i++) shim += `<rect class="shimmer" x="${330+R()*880}" y="${776+i*14}" width="${60+R()*140}" height="1.5" fill="#fff" style="animation-delay:${(R()*4).toFixed(1)}s;animation-duration:${(3+R()*3).toFixed(1)}s"/>`;
+
+  svg.innerHTML = `
+  <defs>
+    <linearGradient id="sky" gradientUnits="userSpaceOnUse" x1="0" y1="-200" x2="0" y2="760"><stop offset="0" style="stop-color:var(--sky1)"/><stop offset="1" style="stop-color:var(--sky2)"/></linearGradient>
+    <linearGradient id="facade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--f1)"/><stop offset="1" style="stop-color:var(--f2)"/></linearGradient>
+    <linearGradient id="sweepg" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".3"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+    <linearGradient id="hor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--sunc)" stop-opacity="0"/><stop offset="1" style="stop-color:var(--sunc)" stop-opacity=".9"/></linearGradient>
+    <radialGradient id="glowS"><stop offset="0" style="stop-color:var(--sunc)" stop-opacity=".75"/><stop offset="1" style="stop-color:var(--sunc)" stop-opacity="0"/></radialGradient>
+    <radialGradient id="moonG"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+    <radialGradient id="warm"><stop offset="0" stop-color="#D4AF37" stop-opacity=".9"/><stop offset="1" stop-color="#D4AF37" stop-opacity="0"/></radialGradient>
+    <radialGradient id="lampG"><stop offset="0" stop-color="#ffd98a" stop-opacity=".9"/><stop offset="1" stop-color="#ffd98a" stop-opacity="0"/></radialGradient>
+    <linearGradient id="rfade" gradientUnits="userSpaceOnUse" x1="0" y1="768" x2="0" y2="890"><stop offset="0" stop-color="#fff" stop-opacity=".6"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+    <mask id="rmask" maskUnits="userSpaceOnUse" x="300" y="768" width="1000" height="130"><rect x="300" y="768" width="1000" height="130" fill="url(#rfade)"/></mask>
+    <filter id="ripple" filterUnits="userSpaceOnUse" x="300" y="768" width="1000" height="130"><feTurbulence type="fractalNoise" baseFrequency="0.003 0.08" numOctaves="1" seed="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="12" xChannelSelector="R" yChannelSelector="G"/></filter>
+    <filter id="blur14" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="14"/></filter>
+    <clipPath id="clipB">${clipRects.map(r=>`<rect x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}"/>`).join('')}</clipPath>
+    <clipPath id="waterClip"><rect x="300" y="768" width="1000" height="130" rx="14"/></clipPath>
+  </defs>
+
+  <rect x="-3000" y="-3000" width="8000" height="3760" fill="url(#sky)"/>
+  <g id="stars" opacity="0">${stars}<line class="shoot" x1="1316" y1="141" x2="1280" y2="160" stroke="#fff" stroke-width="2" stroke-linecap="round"/></g>
+  <g id="moon" opacity="0"><circle r="120" fill="url(#moonG)"/><circle r="30" fill="#f1efe4"/><circle cx="-8" cy="-6" r="6" fill="#dcd8c8"/><circle cx="10" cy="9" r="4" fill="#dcd8c8"/></g>
+  <g id="sun"><circle r="160" fill="url(#glowS)"/><circle r="44" style="fill:var(--sunc)"/></g>
+  <rect id="hor" x="-2000" y="540" width="6000" height="220" fill="url(#hor)" opacity="0"/>
+  <g id="clouds" filter="url(#blur14)" style="fill:var(--cloud)">
+    <g class="cloud"><ellipse cx="380" cy="230" rx="150" ry="22"/><ellipse cx="450" cy="214" rx="90" ry="20"/></g>
+    <g class="cloud" style="animation-duration:110s"><ellipse cx="1000" cy="330" rx="170" ry="24"/><ellipse cx="930" cy="318" rx="100" ry="20"/></g>
+    <g class="cloud" style="animation-duration:95s"><ellipse cx="720" cy="140" rx="120" ry="16"/></g>
+  </g>
+  <ellipse id="warm" cx="750" cy="560" rx="560" ry="380" fill="url(#warm)" opacity="0"/>
+
+  <g id="bldg">
+    <g class="px" data-d="4">${layCity}</g>
+    <g class="px" data-d="7">${layBack}</g>
+    <g class="px" data-d="11">${layMid}</g>
+    <g class="px" data-d="15">${layFront}</g>
+  </g>
+  <g clip-path="url(#clipB)"><rect id="sweep" class="sweep" x="0" y="150" width="130" height="650" fill="url(#sweepg)"/></g>
+
+  <rect class="c-lawn" x="-3000" y="760" width="8000" height="2000"/>
+  <rect class="c-slab" x="300" y="760" width="1000" height="8"/>
+  <rect class="c-water" x="300" y="768" width="1000" height="130" rx="14"/>
+  <g clip-path="url(#waterClip)"><g mask="url(#rmask)"><g filter="url(#ripple)"><use href="#bldg" transform="translate(0 1520) scale(1 -1)"/></g></g>${shim}</g>
+  <rect x="300" y="768" width="1000" height="130" rx="14" fill="none" stroke="#C5A059" stroke-opacity=".35"/>
+  <g id="lamps" opacity="0">${lamps}</g>
+  <g class="px" data-d="26">${tree(70,1.1)}${tree(185,.9)}${tree(1385,1)}${tree(1500,1.2)}${tree(1610,.9)}${tree(-40,1.2)}</g>`;
+
+  // ---- ссылки на элементы ----
+  const $ = id => document.getElementById(id);
+  const L = [...svg.querySelectorAll('#bldg .l')];
+  const T = L.map(e => +e.dataset.t), C = L.map(e => e.dataset.c === '1'), P = L.map(() => -1);
+  const totalWin = C.filter(Boolean).length;
+  const px = [...svg.querySelectorAll('.px')];
+  const el = { sun:$('sun'), moon:$('moon'), stars:$('stars'), hor:$('hor'), warm:$('warm'), lamps:$('lamps'),
+               crown:$('crown'), clouds:$('clouds'), text:$('view-text'), count:$('view-count'), fill:$('rail-fill'), hint:$('view-hint') };
+  const rail = [...document.querySelectorAll('.rail-b')];
+  const STAGE = [
+    ['Утро', 'Утро. Стекло отражает небо, во дворе ещё тихо.'],
+    ['Закат', 'Закат. Фасад ловит последний свет, а в пруду отражается весь дом.'],
+    ['Ночь', 'Ночь. В окнах загорается свет, во дворе включаются фонари.']
+  ];
+  let stage = -1, hoverName = '';
+
+  // Подгоняем видимую область: дом всегда по центру внизу, небо сверху
+  function fit(){
+    const r = svg.getBoundingClientRect(); if (!r.width) return;
+    const a = r.width/r.height, Hv = Math.max(760, 880/a), Wv = Hv*a;
+    svg.setAttribute('viewBox', `${760-Wv/2} ${880-Hv} ${Wv} ${Hv}`);
+  }
+  addEventListener('resize', fit); fit();
+
+  function render(p){
+    for (const k in PAL) svg.style.setProperty('--'+k, pick(PAL[k],p));
+    const night = sm(.55,.95,p), dusk = Math.max(0, 1-Math.abs(p-.5)/.35);
+    el.stars.setAttribute('opacity', (sm(.6,.95,p)*.95).toFixed(3));
+    el.sun.setAttribute('transform', `translate(${1060-p*120} ${150+p*850})`);
+    el.sun.setAttribute('opacity', (1-sm(.5,.68,p)).toFixed(3));
+    el.moon.setAttribute('transform', `translate(1130 ${420-sm(.5,1,p)*200})`);
+    el.moon.setAttribute('opacity', sm(.58,.85,p).toFixed(3));
+    el.hor.setAttribute('opacity', (dusk*.7).toFixed(3));
+    el.warm.setAttribute('opacity', (night*.22).toFixed(3));
+    el.lamps.setAttribute('opacity', sm(.55,.8,p).toFixed(3));
+    el.crown.setAttribute('opacity', night.toFixed(3));
+    el.clouds.setAttribute('opacity', ((1-night*.5)*.9).toFixed(3));
+
+    // Окна загораются по очереди: у каждого свой порог
+    let n = 0;
+    for (let i=0;i<L.length;i++){
+      const o = clamp((p-T[i])/.05,0,1);
+      if (o !== P[i]){ L[i].style.opacity = o; P[i] = o; }
+      if (C[i] && o > .5) n++;
+    }
+    el.count.textContent = `Горит ${n} окон из ${totalWin}`;
+    el.count.style.opacity = sm(.5,.65,p);
+    el.fill.style.width = (p*100)+'%';
+    el.hint.style.opacity = 1 - sm(.02,.08,p);
+
+    const st = p < .25 ? 0 : (p < .72 ? 1 : 2);
+    if (st !== stage){
+      stage = st;
+      rail.forEach((b,i) => b.setAttribute('aria-current', String(i===st)));
+      if (!hoverName) el.text.textContent = STAGE[st][1];
+    }
+  }
+
+  // Параллакс от мыши (отключён при reduced motion и на тач-устройствах)
+  let mx = .5, cx = .5;
+  if (!reduce && matchMedia('(pointer:fine)').matches)
+    sec.addEventListener('pointermove', e => { mx = e.clientX/innerWidth; });
+  function parallax(){
+    cx += (mx-cx)*.08;
+    px.forEach(g => g.style.transform = `translateX(${((.5-cx)*2*g.dataset.d).toFixed(2)}px)`);
+  }
+
+  // Подсказка при наведении на секцию
+  svg.addEventListener('pointerover', e => {
+    const t = e.target.closest && e.target.closest('.tower');
+    hoverName = t ? t.dataset.name : '';
+    el.text.textContent = hoverName || STAGE[stage][1];
+  });
+  svg.addEventListener('click', e => { if (e.target.closest && e.target.closest('.tower')) document.getElementById('flats').scrollIntoView({behavior:'smooth'}); });
+
+  // Кнопки «Утро / Закат / Ночь» прокручивают к нужному моменту
+  rail.forEach(b => b.addEventListener('click', () => {
+    const top = sec.getBoundingClientRect().top + scrollY, span = sec.offsetHeight - innerHeight;
+    scrollTo({ top: top + (+b.dataset.p)*span, behavior: reduce ? 'auto' : 'smooth' });
+  }));
+
+  // Цикл анимации работает, только пока секция на экране
+  let active = false, cur = 0, last = -1;
+  const progress = () => { const r = sec.getBoundingClientRect(); return clamp(-r.top/(r.height-innerHeight),0,1); };
+  function loop(){
+    if (!active) return;
+    const t = progress();
+    cur += (t-cur)*(reduce ? 1 : .14);
+    if (Math.abs(t-cur) < .0004) cur = t;
+    if (Math.abs(cur-last) > 1e-5){ render(cur); last = cur; }
+    parallax();
+    requestAnimationFrame(loop);
+  }
+  render(progress()); cur = last = progress();
+
+  new IntersectionObserver(es => {
+    const v = es[0].isIntersecting;
+    if (v && !active){ active = true; fit(); loop(); }
+    else if (!v) active = false;
+    if (es[0].intersectionRatio > .3) $('sweep').classList.add('go');   // блик по фасаду — один раз
+  }, { threshold:[0,.3] }).observe(sec);
+})();
+
+</script>
+</body>
+</html>
