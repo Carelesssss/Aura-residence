@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="aura-residence-production.up.railway.app"><b>View live demo →</b></a>
+  <a href="https://aura-residence-production.up.railway.app"><b>View live demo →</b></a>
 </p>
 
 <p align="center">
@@ -52,23 +52,5 @@ The whole site is one file: `index.html`.
 ## Run locally
 
 ```bash
-git clone https://github.com/Carelesssss/Aura-residence.git
+git clone [https://github.com/Carelesssss/Aura-residence.git](https://github.com/Carelesssss/Aura-residence.git)
 cd Aura-residence
-```
-
-Then open `index.html` in any browser. No build step or server is needed (an internet connection is required for fonts and Tailwind).
-
-## Customize
-
-- **Apartments:** edit the `FLATS` array near the end of `index.html`
-- **Video:** put an embed link into the `VIDEO_URL` constant
-- **Colors and fonts:** change the `tailwind.config` block at the top
-- **Contacts and prices:** replace the placeholders in the footer and data
-
-## Author
-
-Made by **Ivan**, web designer and front-end developer. Open to freelance work: landing pages, portfolio sites, and promo pages.
-
----
-
-<p align="center"><sub>© 2026 AURA RESIDENCE · concept project</sub></p>
