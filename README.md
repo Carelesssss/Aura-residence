@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="https://carelesssss.github.io/Aura-residence/"><b>View live demo →</b></a>
+  <a href="aura-residence-production.up.railway.app"><b>View live demo →</b></a>
 </p>
 
 <p align="center">
